@@ -1,0 +1,8 @@
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\bin\Debug\ProcessMiner.exe
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\bin\Debug\ProcessMiner.pdb
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\bin\Debug\mysql.data.dll
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\bin\Debug\Newtonsoft.Json.dll
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\bin\Debug\Newtonsoft.Json.xml
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\obj\Debug\ProcessMiner.csprojResolveAssemblyReference.cache
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\obj\Debug\ProcessMiner.exe
+C:\PROJECTS\VS2017\ProcessMiner\ProcessMiner\obj\Debug\ProcessMiner.pdb

@@ -1,0 +1,16 @@
+C:\PROJ\csharp\DataMiner\DataMiner\obj\Debug\DataMiner.csprojResolveAssemblyReference.cache
+C:\PROJ\csharp\DataMiner\DataMiner\obj\Debug\DataMiner.csproj.CoreCompileInputs.cache
+C:\PROJ\csharp\DataMiner\DataMiner\bin\Debug\DataMiner.exe
+C:\PROJ\csharp\DataMiner\DataMiner\bin\Debug\DataMiner.pdb
+C:\PROJ\csharp\DataMiner\DataMiner\bin\Debug\Newtonsoft.Json.dll
+C:\PROJ\csharp\DataMiner\DataMiner\bin\Debug\Newtonsoft.Json.xml
+C:\PROJ\csharp\DataMiner\DataMiner\obj\Debug\DataMiner.exe
+C:\PROJ\csharp\DataMiner\DataMiner\obj\Debug\DataMiner.pdb
+C:\PROJECTS\VS2017\DataMiner\DataMiner\obj\Debug\DataMiner.csprojResolveAssemblyReference.cache
+C:\PROJECTS\VS2017\DataMiner\DataMiner\bin\Debug\Newtonsoft.Json.dll
+C:\PROJECTS\VS2017\DataMiner\DataMiner\bin\Debug\Newtonsoft.Json.xml
+C:\PROJECTS\VS2017\DataMiner\DataMiner\bin\Debug\mysql.data.dll
+C:\PROJECTS\VS2017\DataMiner\DataMiner\bin\Debug\ProcessMiner.exe
+C:\PROJECTS\VS2017\DataMiner\DataMiner\bin\Debug\ProcessMiner.pdb
+C:\PROJECTS\VS2017\DataMiner\DataMiner\obj\Debug\ProcessMiner.exe
+C:\PROJECTS\VS2017\DataMiner\DataMiner\obj\Debug\ProcessMiner.pdb
