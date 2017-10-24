@@ -16,7 +16,7 @@ namespace ProcessMiner
             
             long lastDateIC = miner.LastDateMySQL();
             miner.InsertNewProcessFromDate(lastDateIC,1/*один день*/);
-            
+            miner.CheckComplitedProcess();
             miner.CloseMySQL();
             miner.CloseDB2();
             //Console.ReadLine();
