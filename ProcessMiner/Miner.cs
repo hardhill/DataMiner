@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Data.Common;
 using System.Data.OleDb;
+using System.Data.SqlTypes;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
+using System.Runtime.CompilerServices;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -159,11 +162,12 @@ namespace ProcessMiner
                         while (reader.Read())
                         {
                             if (!reader.IsDBNull(0))
-                                lastTick = reader.GetInt64(0);
+                                lastTick = reader.GetDateTime(0).Ticks;
                         }
                     }
                 }
             }
+            SaveLastDate(lastTick);
             Log.wi(DateTime.Now, "Последняя дата в БД ИнфоЦентр", new DateTime(lastTick).ToString("yyyy-MM-dd HH:mm:ss.fff"));
             return lastTick;
         }
@@ -171,8 +175,10 @@ namespace ProcessMiner
         public int InsertNewProcessFromDate(long lastDateIc, int iday)
         {
             int alladd = 0;
-            string nnn;
+            string nnn = "NULL";
             string sql;
+            int allAdded = 0;
+            OneProcess oneProcess = new OneProcess();
             DateTime dtfrom = new DateTime(lastDateIc);
             DateTime dtto = dtfrom.AddDays(iday);
             string sDateFrom = dtfrom.ToString("yyyy-MM-dd hh:mm:ss.fff");
@@ -192,50 +198,65 @@ namespace ProcessMiner
                 {
                     while (readerDB2.Read())
                     {
-                        long id_process = readerDB2.GetInt64(0);
-                        DateTime dt1 = readerDB2.GetDateTime(1);
-                        if (!readerDB2.IsDBNull(2))
+                        try
                         {
-                            DateTime dt2 = readerDB2.GetDateTime(2);
-                            nnn = dt2.ToString(DATEFORMAT);
-                        }
-                        else
-                        {
-                            nnn = "NULL";
-                        }
-                        int id_status = readerDB2.GetInt32(3);
-                        int id_type_process = readerDB2.GetInt32(4);
-                        int id_department = readerDB2.GetInt32(5);
+                            oneProcess.Id_Process = readerDB2.GetInt64(0);
+                            oneProcess.Dateofcomming = readerDB2.GetDateTime(1);
+                            if (!readerDB2.IsDBNull(2))
+                            {
+                                oneProcess.Dateofcomletion = readerDB2.GetDateTime(2);
+                                nnn = oneProcess.Dateofcomletion.ToString(DATEFORMAT);
+                            }
+                            else
+                            {
+                                nnn = "NULL";
+                            }
+                            if (!readerDB2.IsDBNull(3))
+                            {
+                                oneProcess.id_Status = readerDB2.GetInt16(3);
+                            }
+                            if (!readerDB2.IsDBNull(4))
+                            {
+                                oneProcess.id_Type_process = readerDB2.GetInt16(4);
+                            }
+                            oneProcess.id_Department = readerDB2.GetInt16(5);
 
-                        Log.wi(DateTime.Now, "Добавление данных в ИнфоЦентр", "");
+                            
+                        }
+                        catch (Exception e)
+                        {
+                            Log.we(DateTime.Now, "Добавление данных в ИнфоЦентр",e.Message);
+                        }
                         if (nnn != "NULL")
                         {
                             sql = string.Format(
                                 "INSERT INTO PROCESSES (ID_PROCESS, DATEOFCOMMING, DATEOFCOMPLETION, ID_STATUS, ID_TYPE_PROCESS, ID_DEPARTMENT)" +
-                                "VALUES({0},'{1}','{2}',{3},{4},{5});", id_process, dt1.ToString(DATEFORMAT), nnn,
-                                id_status, id_type_process, id_department);
+                                "VALUES({0},'{1}','{2}',{3},{4},{5});", oneProcess.Id_Process, oneProcess.Dateofcomming.ToString(DATEFORMAT), nnn,
+                                oneProcess.id_Status, oneProcess.id_Type_process, oneProcess.id_Department);
                         }
                         else
                         {
                             //вариант запроса с пустым значением даты
                             sql = string.Format(
                                 "INSERT INTO PROCESSES (ID_PROCESS, DATEOFCOMMING, DATEOFCOMPLETION, ID_STATUS, ID_TYPE_PROCESS, ID_DEPARTMENT)" +
-                                "VALUES({0},'{1}',{2},{3},{4},{5});", id_process, dt1.ToString(DATEFORMAT), nnn,
-                                id_status, id_type_process, id_department);
+                                "VALUES({0},'{1}',{2},{3},{4},{5});", oneProcess.Id_Process, oneProcess.Dateofcomming.ToString(DATEFORMAT), nnn,
+                                oneProcess.id_Status, oneProcess.id_Type_process, oneProcess.id_Department);
                         }
                         //подготовим вставку в БД Инфоцентра
                         MySqlCommand commandMySQL = new MySqlCommand(sql, connectionMySQL);
-                        //добавляем записи
+                        //добавляем запись
                         try
                         {
                             alladd = commandMySQL.ExecuteNonQuery();
-                            Log.wi(DateTime.Now, "Добавляем процесс", i: string.Format("Id_process:{0}", id_process));
+                            allAdded += alladd;
                         }
                         catch (Exception e)
                         {
                             Log.we(DateTime.Now, "Запись в БД Инфоцентр", e.Message);
                         }
-                    }
+                    } //цикл по найденым в ПФР
+                    
+                    Log.wi(DateTime.Now, "Новые процессы", i: string.Format("Добавлено:{0}", allAdded));
                 }
                 else /*в БД ИЦ ничего не нашлось*/
                 {
@@ -247,9 +268,10 @@ namespace ProcessMiner
                 }
             } //selected data
 
-            return alladd;
+            return allAdded;
         }
 
+        //сохраняет дату в файле настроек
         private void SaveLastDate(long lastDateIc)
         {
             _params.StartDate = new DateTime(lastDateIc).ToString(DATEFORMAT);
@@ -260,16 +282,97 @@ namespace ProcessMiner
             }
         }
 
+        //увеличивает на Н дней текущую, крайнюю дату проверки процессов
         private long IncrementDate(long lastDateIc, short days)
         {
+            DateTime dtto;
             DateTime dtfrom = new DateTime(lastDateIc);
-            DateTime dtto = dtfrom.AddDays(days);
+            if (DateTime.Now > dtfrom)
+            {
+               dtto  = dtfrom.AddDays(days);
+            }
+            else
+            {
+                dtto = DateTime.Now;
+            }
             return dtto.Ticks;
         }
 
+        // проверка выполненных процессов
         public void CheckComplitedProcess()
         {
-            //
+            string sql = String.Format("SELECT ID_PROCESS FROM PROCESSES AS T WHERE (T.DATEOFCOMPLETION IS NULL)",
+                _params.Department);
+            MySqlCommand commandMySQL = new MySqlCommand(sql, connectionMySQL);
+            using (MySqlDataReader readerMySQL = commandMySQL.ExecuteReader())
+            {
+                if (readerMySQL.HasRows)
+                {
+                    while (readerMySQL.Read())
+                    {
+                        long id_processMySQL = readerMySQL.GetInt64(0);
+                        //теперь по этому значению вытаскиваем данные из БД ПФР
+                        OneProcess processMySQL = new OneProcess();
+                        //и записываем в класс
+                        processMySQL = GetProcessFromDB2(id_processMySQL);
+                        // обновляем данные в БД ИнфоЦентра
+                        UpdateMySQLProcess(processMySQL);
+                    }
+                }
+            }
+        }
+
+        private void UpdateMySQLProcess(OneProcess pr)
+        {
+            string sql = String.Format(
+                "UPDATE PROCESSES SET DATEOFCOMPLETION = '{0}', ID_STATUS = {1}, ID_TYPE_PROCESS = {2} WHERE ID_PROCESS = {3}",
+                pr.Dateofcomletion.ToString(DATEFORMAT),
+                pr.id_Status,
+                pr.id_Type_process,
+                pr.Id_Process);
+            try
+            {
+                MySqlCommand commandMySQL = new MySqlCommand(sql, connectionMySQL);
+                if (commandMySQL.ExecuteNonQuery() > 0)
+                {
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                
+            }
+        }
+
+        private OneProcess GetProcessFromDB2(long idProcessMySql)
+        {
+            OneProcess process = new OneProcess();
+            try
+            {
+                string sql = String.Format("SELECT * FROM DB2.ADMIN AS T WHERE T.ID_PROCESS = {0}", idProcessMySql);
+                OleDbCommand commandDb2 = new OleDbCommand(sql, connectionDb2);
+                using (OleDbDataReader readerDb2 = commandDb2.ExecuteReader())
+                {
+                    if (readerDb2.HasRows)
+                    {
+                        if (readerDb2.Read())
+                        {
+                            process.Id_Process = readerDb2.GetInt64(0);
+                            process.Dateofcomming = readerDb2.GetDateTime(1);
+                            process.Dateofcomletion = readerDb2.GetDateTime(2);
+                            process.id_Status = readerDb2.GetInt16(3);
+                            process.id_Type_process = readerDb2.GetInt16(4);
+                            process.id_Department = readerDb2.GetInt16(5);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return process;
         }
     }
 }

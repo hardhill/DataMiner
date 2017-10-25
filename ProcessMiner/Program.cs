@@ -8,7 +8,7 @@ namespace ProcessMiner
     {
         public static void Main(string[] args)
         {
-            // read file json
+            // 
             Log.w("============================= Start ============================================");
             Miner miner = new Miner();
             miner.ConnectToDB2();
@@ -17,6 +17,7 @@ namespace ProcessMiner
             long lastDateIC = miner.LastDateMySQL();
             miner.InsertNewProcessFromDate(lastDateIC,1/*один день*/);
             miner.CheckComplitedProcess();
+            
             miner.CloseMySQL();
             miner.CloseDB2();
             //Console.ReadLine();

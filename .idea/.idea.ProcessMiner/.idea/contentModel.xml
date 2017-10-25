@@ -10,6 +10,7 @@
         <e p="obj" t="ExcludeRecursive" />
         <e p="packages.config" t="Include" />
         <e p="Params.cs" t="Include" />
+        <e p="Process.cs" t="Include" />
         <e p="ProcessMiner.csproj" t="IncludeRecursive" />
         <e p="Program.cs" t="Include" />
         <e p="Properties" t="Include">
