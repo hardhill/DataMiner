@@ -14,7 +14,8 @@
         public string msqlPassword { get; set; }
         public string msqlProtocol { get; set; }
         public string msqlPort { get; set; }
-        public string StartDate { get; set; }
+        public string StartDateProcess { get; set; }
+        public string StartDateTasks { get; set; }
         public int Department { get; set; }
         
     }

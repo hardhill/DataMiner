@@ -50,8 +50,9 @@
   <ItemGroup>
     <Compile Include="Log.cs" />
     <Compile Include="Miner.cs" />
+    <Compile Include="OneTask.cs" />
     <Compile Include="Params.cs" />
-    <Compile Include="Process.cs" />
+    <Compile Include="OneProcess.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

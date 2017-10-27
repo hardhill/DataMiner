@@ -9,13 +9,15 @@ namespace ProcessMiner
         public static void Main(string[] args)
         {
             // 
-            Log.w("============================= Start ============================================");
+            Log.w("============================= DataMiner 2017-10-27_1 ============================================");
             Miner miner = new Miner();
             miner.ConnectToDB2();
             miner.ConnectToMySQL();
             
-            long lastDateIC = miner.LastDateMySQL();
-            miner.InsertNewProcessFromDate(lastDateIC,1/*один день*/);
+            long lastDateICProcess = miner.LastDateProcessMySQL();
+            long lastDateICTasks = miner.LastDateTasksMySQL();
+            miner.InsertNewProcessFromDate(lastDateICProcess,1/*один день*/);
+            miner.InsertNewTasksFromDate(lastDateICTasks,1);
             miner.CheckComplitedProcess();
             
             miner.CloseMySQL();
